@@ -21,10 +21,10 @@ public class EstudianteController {
         this.estudianteService = estudianteService;
     }
 
-    @GetMapping("/formularioEstudiante")
+    @GetMapping("/registroEstudiante")
     public String mostrarFormulario(Model model) {
         model.addAttribute("estudiante", new EstudianteEntity());
-        return "index";
+        return "registroEstudiante";
     }
 
     @PostMapping("/guardarEstudiante")
@@ -36,6 +36,6 @@ public class EstudianteController {
                                     @RequestParam String nombre_colegio,
                                     @RequestParam Integer anio_egreso) {
         estudianteService.guardarEstudiante(rut, apellidos, nombres, fecha_nacimiento, tipo_colegio, nombre_colegio, anio_egreso);
-        return "index";
+        return "registroEstudiante";
     }
 }
