@@ -15,6 +15,11 @@
 	<description>Demo project for Spring Boot</description>
 	<properties>
 		<java.version>17</java.version>
+		<sonar.exclusions>
+			src/main/java/com/example/demo/entities/*,
+			src/main/java/com/example/demo/controllers/*,
+			src/main/java/com/example/demo/repositories/*
+		</sonar.exclusions>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -62,6 +67,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<finalName>webApp_Jaramillo</finalName>
 	</build>
 
 </project>

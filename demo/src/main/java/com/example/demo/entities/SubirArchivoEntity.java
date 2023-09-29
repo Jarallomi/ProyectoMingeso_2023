@@ -19,4 +19,5 @@ public class SubirArchivoEntity {
 
     private String fecha;
     private Integer puntaje;
+    private Integer n_examenes;
 }
