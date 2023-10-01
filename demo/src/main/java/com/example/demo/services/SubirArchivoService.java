@@ -1,6 +1,5 @@
 package com.example.demo.services;
 
-import com.example.demo.entities.EstudianteEntity;
 import com.example.demo.entities.SubirArchivoEntity;
 import com.example.demo.repositories.SubirArchivoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +24,6 @@ public class SubirArchivoService {
 
     @Autowired
     private SubirArchivoRepository archivoRepository;
-    @Autowired
-    private EstudianteService estudianteService;
 
     private final Logger logg = LoggerFactory.getLogger(SubirArchivoService.class);
 

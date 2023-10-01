@@ -23,4 +23,6 @@ public class EstudianteEntity {
     private String tipo_colegio;
     private String nombre_colegio;
     private Integer anio_egreso;
+    private String tipo_pago;
+    private Integer n_cuotas = 0;
 }

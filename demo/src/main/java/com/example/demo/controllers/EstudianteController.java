@@ -34,8 +34,10 @@ public class EstudianteController {
                                     @RequestParam String fecha_nacimiento,
                                     @RequestParam String tipo_colegio,
                                     @RequestParam String nombre_colegio,
-                                    @RequestParam Integer anio_egreso) {
-        estudianteService.guardarEstudiante(rut, apellidos, nombres, fecha_nacimiento, tipo_colegio, nombre_colegio, anio_egreso);
+                                    @RequestParam Integer anio_egreso,
+                                    @RequestParam String tipo_pago,
+                                    @RequestParam Integer n_cuotas){
+        estudianteService.guardarEstudiante(rut, apellidos, nombres, fecha_nacimiento, tipo_colegio, nombre_colegio, anio_egreso, tipo_pago, n_cuotas);
         return "registroEstudiante";
     }
 }
