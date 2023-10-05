@@ -26,42 +26,104 @@ public class ResumenService {
     private SubirArchivoRepository archivoRepository;
     @Autowired
     public ResumenService(CalculosCuotas calculosCuotas){
+
         this.calculosCuotas = calculosCuotas;
     }
 
+
     public void guardarResumen(){
+
         List<EstudianteEntity> estudiantes = (List<EstudianteEntity>) estudianteRepository.findAll();
 
         for (EstudianteEntity estudiante : estudiantes){
             String rut = estudiante.getRut();
+            Optional<ResumenEntity> resumenOpcional = resumenRepository.findById(rut);
 
-            Optional<SubirArchivoEntity> archivoOpcional = archivoRepository.findById(rut);
+            if(!resumenOpcional.isPresent()) {
+                Optional<SubirArchivoEntity> archivoOpcional = archivoRepository.findById(rut);
+                if (archivoOpcional.isPresent()) {
+                    SubirArchivoEntity archivo = archivoOpcional.get();
 
-            if (archivoOpcional.isPresent()){
-                SubirArchivoEntity archivo = archivoOpcional.get();
-
-                double monto_previo = calculosCuotas.calcularCuotaFinal(estudiante, archivo, 1500000);
-                int monto_a_pagar = (int) monto_previo;
-                ResumenEntity resumen = resumenRepository.findById(rut).orElse(new ResumenEntity());
-                resumen.setRut(rut);
-                resumen.setNombre(estudiante.getNombres() + " " + estudiante.getApellidos());
-                resumen.setN_examenes(archivo.getN_examenes());
-                resumen.setPromedio(archivo.getPuntaje());
-                resumen.setMonto_total_a_pagar(monto_a_pagar);
-                resumen.setTipo_de_pago(estudiante.getTipo_pago());
-                resumen.setN_cuotas_pactadas(estudiante.getN_cuotas());
-                resumen.setN_cuotas_pagadas(0);
-                resumen.setMonto_total_pagado(0);
-                resumen.setFecha_ultimo_pago(null);
-                resumen.setSaldo_por_pagar((monto_a_pagar / estudiante.getN_cuotas()));
-                resumen.setN_cuotas_retraso(0);
-                resumenRepository.save(resumen);
+                    double monto_previo = calculosCuotas.calcularCuotaFinal(estudiante, archivo, 1500000);
+                    int monto_a_pagar = (int) monto_previo;
+                    ResumenEntity resumen = new ResumenEntity();
+                    resumen.setRut(rut);
+                    resumen.setNombre(estudiante.getNombres() + " " + estudiante.getApellidos());
+                    resumen.setN_examenes(archivo.getN_examenes());
+                    resumen.setPromedio(archivo.getPuntaje());
+                    resumen.setMonto_total_a_pagar(monto_a_pagar);
+                    resumen.setTipo_de_pago(estudiante.getTipo_pago());
+                    resumen.setN_cuotas_pactadas(estudiante.getN_cuotas());
+                    resumen.setN_cuotas_pagadas(0);
+                    resumen.setMonto_total_pagado(0);
+                    resumen.setFecha_ultimo_pago(null);
+                    resumen.setSaldo_por_pagar(((monto_a_pagar - 70000) / estudiante.getN_cuotas()) + 70000);
+                    resumen.setN_cuotas_retraso(0);
+                    resumenRepository.save(resumen);
+                    System.out.println(resumen);
+                }
             }
         }
+
     }
 
     public List<ResumenEntity> obtenerTodosLosResumenes() {
         return (List<ResumenEntity>) resumenRepository.findAll();
+    }
+
+    public boolean estaPagadaMatricula(ResumenEntity estudiante){
+        return estudiante.getMonto_total_pagado() > 70000;
+    }
+
+    public void modificarCuota(Date fecha_pago, String rut){
+        ResumenEntity resumen = resumenRepository.findById(rut).get();
+
+        int monto_por_pagar = resumen.getSaldo_por_pagar();
+        int n_cuotas_pagadas = resumen.getN_cuotas_pagadas() + 1;
+        int n_cuotas_nuevas = resumen.getN_cuotas_pactadas() - n_cuotas_pagadas;
+
+        if(n_cuotas_nuevas == 0){
+            n_cuotas_nuevas = 1;
+        }
+        resumen.setFecha_ultimo_pago(fecha_pago);
+        resumen.setMonto_total_pagado(resumen.getMonto_total_pagado() + monto_por_pagar);
+        resumen.setN_cuotas_pagadas(n_cuotas_pagadas);
+        resumen.setSaldo_por_pagar(((resumen.getMonto_total_a_pagar() - resumen.getMonto_total_pagado())/ n_cuotas_nuevas));
+        if(resumen.getN_cuotas_pagadas() > resumen.getN_cuotas_pactadas()){
+            resumen.setN_cuotas_pagadas(resumen.getN_cuotas_pactadas());
+        }
+        resumenRepository.save(resumen);
+    }
+
+    public String formatearRut(String rut) {
+        // Verificar si el RUT es nulo o vacío
+        if (rut == null || rut.isEmpty()) {
+            return "";
+        }
+
+        // Separar la parte numérica y el dígito verificador
+        String rutNumerico = rut.substring(0, rut.length() - 1);
+        String digitoVerificador = rut.substring(rut.length() - 1);
+
+        // Dar formato al RUT con puntos y guión
+        StringBuilder rutFormateado = new StringBuilder();
+        int contador = 0;
+
+        // Iterar sobre el RUT numérico en reversa para agregar los puntos
+        for (int i = rutNumerico.length() - 1; i >= 0; i--) {
+            if (contador == 3) {
+                rutFormateado.insert(0, ".");
+                contador = 0;
+            }
+            rutFormateado.insert(0, rutNumerico.charAt(i));
+            contador++;
+        }
+
+        // Agregar el dígito verificador y el guión
+        rutFormateado.append("-");
+        rutFormateado.append(digitoVerificador);
+
+        return rutFormateado.toString();
     }
 
 

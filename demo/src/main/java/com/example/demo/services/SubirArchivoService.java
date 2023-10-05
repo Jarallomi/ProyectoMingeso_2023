@@ -87,9 +87,7 @@ public class SubirArchivoService {
         }
     }
     public SubirArchivoEntity obtenerPorRut(String rut){
-        System.out.println("\n\nAQUÍ ESTA TODO: " + archivoRepository.findAll());
         Optional<SubirArchivoEntity> archivo = archivoRepository.findById(rut);
-
         return archivo.orElse(null);
     }
     public void guardarArchivo(SubirArchivoEntity archivo) {

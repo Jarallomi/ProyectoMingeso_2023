@@ -33,5 +33,10 @@ public class ResumenEntity {
     private Integer saldo_por_pagar;
     private Integer n_cuotas_retraso;
 
+    public String getRutSinPuntosYGuion() {
+        return rut.replace(".", "").replace("-", "");
+
+    }
+
 
 }

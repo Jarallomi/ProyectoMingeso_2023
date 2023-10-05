@@ -18,7 +18,13 @@ public class EstudianteController {
 
     @Autowired
     public EstudianteController(EstudianteService estudianteService) {
+
         this.estudianteService = estudianteService;
+    }
+
+    @GetMapping("/index")
+    public String mostrarPaginaDeInicio() {
+        return "index";
     }
 
     @GetMapping("/registroEstudiante")

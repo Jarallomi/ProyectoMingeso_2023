@@ -74,6 +74,18 @@
                 <span class="money-format" th:text="${resumen.saldo_por_pagar}"></span>
             </td>
             <td th:text="${resumen.n_cuotas_retraso}"></td>
+            <td>
+                <!-- Condición para mostrar el mensaje "El pago está al día" -->
+                <div th:if="${resumen.n_cuotas_pactadas == resumen.n_cuotas_pagadas}">
+                    El pago está al día
+                </div>
+
+                <!-- Condición para mostrar el botón de registro de pago -->
+                <div th:unless="${resumen.n_cuotas_pactadas == resumen.n_cuotas_pagadas}">
+                    <a th:href="@{'/registrarPagoCuotas?rut=' + ${resumen.rutSinPuntosYGuion}}"
+                       class="btn btn-primary btn-sm">Registrar Pago de Cuotas</a>
+                </div>
+            </td>
         </tr>
         </tbody>
     </table>
