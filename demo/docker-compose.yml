@@ -1,0 +1,26 @@
+version: "3.9"
+services:
+  postgres-db:
+    image: postgres
+    restart: always
+    volumes:
+      - ./data/db:/var/lib/postgresql
+    environment:
+      POSTGRES_PASSWORD: 2905
+      POSTGRES_DB: ProyectoMingeso
+    ports:
+      - 5432:5432
+  app:
+    container_name: proyecto_tingeso
+    image: jaramillo1337/proyecto_tingeso
+    ports:
+      - "8086:8086"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/ProyectoMingeso?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=2905
+    deploy:
+      restart_policy:
+        condition: on-failure
+    depends_on:
+      - postgres-db

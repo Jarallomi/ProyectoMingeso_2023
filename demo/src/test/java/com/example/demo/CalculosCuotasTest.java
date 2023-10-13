@@ -32,4 +32,17 @@ public class CalculosCuotasTest {
         double cuotaFinal = cuotas.calcularCuotaPuntajes(archivo, 10000);
         assertEquals(9500, cuotaFinal, 0.0);
     }
+
+   @Test
+    void calcularCuotaTipoColegio(){
+        estudiante.setTipo_colegio("Municipal");
+
+        double cuotaFinal = cuotas.calcularCuotaTipoColegio(estudiante, 1500000);
+        assertEquals(1200000, cuotaFinal, 0.0);
+
+        estudiante.setTipo_colegio("Subvencionado");
+
+        double cuotaFinal2 = cuotas.calcularCuotaTipoColegio(estudiante, 1500000);
+        assertEquals(1350000, cuotaFinal2, 0.0);
+    }
 }

@@ -9,6 +9,7 @@ import com.example.demo.repositories.SubirArchivoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -60,7 +61,6 @@ public class ResumenService {
                     resumen.setSaldo_por_pagar(((monto_a_pagar - 70000) / estudiante.getN_cuotas()) + 70000);
                     resumen.setN_cuotas_retraso(0);
                     resumenRepository.save(resumen);
-                    System.out.println(resumen);
                 }
             }
         }
@@ -78,21 +78,59 @@ public class ResumenService {
     public void modificarCuota(Date fecha_pago, String rut){
         ResumenEntity resumen = resumenRepository.findById(rut).get();
 
+        Calendar fecha_nueva = Calendar.getInstance();
+
         int monto_por_pagar = resumen.getSaldo_por_pagar();
         int n_cuotas_pagadas = resumen.getN_cuotas_pagadas() + 1;
         int n_cuotas_nuevas = resumen.getN_cuotas_pactadas() - n_cuotas_pagadas;
 
-        if(n_cuotas_nuevas == 0){
-            n_cuotas_nuevas = 1;
+        int meses_atraso = calcularMesesAtraso(fecha_pago, fecha_nueva.getTime());
+
+        if (meses_atraso >= 1){
+            double interes = (0.03 * meses_atraso) + 1;
+
+            if(n_cuotas_nuevas == 0){
+                n_cuotas_nuevas = 1;
+            }
+
+            resumen.setFecha_ultimo_pago(fecha_pago);
+            resumen.setMonto_total_pagado(resumen.getMonto_total_pagado() + monto_por_pagar);
+            int nuevo_monto_1 = (int)((resumen.getMonto_total_a_pagar() - resumen.getMonto_total_pagado()) * interes);
+            int nuevo_monto_2 = resumen.getMonto_total_pagado() + nuevo_monto_1;
+            resumen.setN_cuotas_pagadas(n_cuotas_pagadas);
+            resumen.setSaldo_por_pagar((int)(((resumen.getMonto_total_a_pagar() - resumen.getMonto_total_pagado())/ n_cuotas_nuevas) * interes));
+            resumen.setMonto_total_a_pagar(nuevo_monto_2);
+            if(resumen.getN_cuotas_pagadas() > resumen.getN_cuotas_pactadas()){
+                resumen.setN_cuotas_pagadas(resumen.getN_cuotas_pactadas());
+            }
+            resumenRepository.save(resumen);
         }
-        resumen.setFecha_ultimo_pago(fecha_pago);
-        resumen.setMonto_total_pagado(resumen.getMonto_total_pagado() + monto_por_pagar);
-        resumen.setN_cuotas_pagadas(n_cuotas_pagadas);
-        resumen.setSaldo_por_pagar(((resumen.getMonto_total_a_pagar() - resumen.getMonto_total_pagado())/ n_cuotas_nuevas));
-        if(resumen.getN_cuotas_pagadas() > resumen.getN_cuotas_pactadas()){
-            resumen.setN_cuotas_pagadas(resumen.getN_cuotas_pactadas());
+        else {
+            if (n_cuotas_nuevas == 0) {
+                n_cuotas_nuevas = 1;
+            }
+            resumen.setFecha_ultimo_pago(fecha_pago);
+            resumen.setMonto_total_pagado(resumen.getMonto_total_pagado() + monto_por_pagar);
+            resumen.setN_cuotas_pagadas(n_cuotas_pagadas);
+            resumen.setSaldo_por_pagar(((resumen.getMonto_total_a_pagar() - resumen.getMonto_total_pagado()) / n_cuotas_nuevas));
+            if (resumen.getN_cuotas_pagadas() > resumen.getN_cuotas_pactadas()) {
+                resumen.setN_cuotas_pagadas(resumen.getN_cuotas_pactadas());
+            }
+            resumenRepository.save(resumen);
         }
-        resumenRepository.save(resumen);
+    }
+
+    private int calcularMesesAtraso(Date fechaPago, Date fechaActual) {
+        Calendar calPago = Calendar.getInstance();
+        calPago.setTime(fechaPago);
+
+        Calendar calActual = Calendar.getInstance();
+        calActual.setTime(fechaActual);
+
+        int years = calActual.get(Calendar.YEAR) - calPago.get(Calendar.YEAR);
+        int months = calActual.get(Calendar.MONTH) - calPago.get(Calendar.MONTH);
+
+        return years * 12 + months;
     }
 
     public String formatearRut(String rut) {

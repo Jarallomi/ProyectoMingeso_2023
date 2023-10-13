@@ -115,11 +115,6 @@ public class SubirArchivoService {
 
     }
 
-    public void eliminarArchivo(ArrayList<SubirArchivoEntity> archivos){
-        archivoRepository.deleteAll(archivos);
-    }
-
-
 
 
 }
