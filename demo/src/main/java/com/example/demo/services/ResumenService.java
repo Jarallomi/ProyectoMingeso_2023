@@ -17,30 +17,23 @@ import java.util.Optional;
 @Service
 public class ResumenService {
 
-    private final CalculosCuotas calculosCuotas;
-
+    @Autowired
+    private CalculosCuotas calculosCuotas;
     @Autowired
     private ResumenRepository resumenRepository;
     @Autowired
     private EstudianteRepository estudianteRepository;
     @Autowired
     private SubirArchivoRepository archivoRepository;
-    @Autowired
-    public ResumenService(CalculosCuotas calculosCuotas){
-
-        this.calculosCuotas = calculosCuotas;
-    }
-
 
     public void guardarResumen(){
-
         List<EstudianteEntity> estudiantes = (List<EstudianteEntity>) estudianteRepository.findAll();
 
         for (EstudianteEntity estudiante : estudiantes){
             String rut = estudiante.getRut();
             Optional<ResumenEntity> resumenOpcional = resumenRepository.findById(rut);
 
-            if(!resumenOpcional.isPresent()) {
+            if(resumenOpcional.isEmpty()) {
                 Optional<SubirArchivoEntity> archivoOpcional = archivoRepository.findById(rut);
                 if (archivoOpcional.isPresent()) {
                     SubirArchivoEntity archivo = archivoOpcional.get();
@@ -71,48 +64,41 @@ public class ResumenService {
         return (List<ResumenEntity>) resumenRepository.findAll();
     }
 
-    public boolean estaPagadaMatricula(ResumenEntity estudiante){
-        return estudiante.getMonto_total_pagado() > 70000;
-    }
-
     public void modificarCuota(Date fecha_pago, String rut){
-        ResumenEntity resumen = resumenRepository.findById(rut).get();
+        if(resumenRepository.findById(rut).isPresent()) {
+            ResumenEntity resumen = resumenRepository.findById(rut).get();
 
-        Calendar fecha_nueva = Calendar.getInstance();
+            Calendar fecha_nueva = Calendar.getInstance();
 
-        int monto_por_pagar = resumen.getSaldo_por_pagar();
-        int n_cuotas_pagadas = resumen.getN_cuotas_pagadas() + 1;
-        int n_cuotas_nuevas = resumen.getN_cuotas_pactadas() - n_cuotas_pagadas;
+            int monto_por_pagar = resumen.getSaldo_por_pagar();
+            int n_cuotas_pagadas = resumen.getN_cuotas_pagadas() + 1;
+            int n_cuotas_nuevas = resumen.getN_cuotas_pactadas() - n_cuotas_pagadas;
 
-        int meses_atraso = calcularMesesAtraso(fecha_pago, fecha_nueva.getTime());
+            int meses_atraso = calcularMesesAtraso(fecha_pago, fecha_nueva.getTime());
 
-        if (meses_atraso >= 1){
-            double interes = (0.03 * meses_atraso) + 1;
+            if (meses_atraso >= 1) {
+                double interes = (0.03 * meses_atraso) + 1;
 
-            if(n_cuotas_nuevas == 0){
-                n_cuotas_nuevas = 1;
+                if (n_cuotas_nuevas == 0) {
+                    n_cuotas_nuevas = 1;
+                }
+
+                resumen.setFecha_ultimo_pago(fecha_pago);
+                resumen.setMonto_total_pagado(resumen.getMonto_total_pagado() + monto_por_pagar);
+                int nuevo_monto_1 = (int) ((resumen.getMonto_total_a_pagar() - resumen.getMonto_total_pagado()) * interes);
+                int nuevo_monto_2 = resumen.getMonto_total_pagado() + nuevo_monto_1;
+                resumen.setN_cuotas_pagadas(n_cuotas_pagadas);
+                resumen.setSaldo_por_pagar((int) (((resumen.getMonto_total_a_pagar() - resumen.getMonto_total_pagado()) / n_cuotas_nuevas) * interes));
+                resumen.setMonto_total_a_pagar(nuevo_monto_2);
+            } else {
+                if (n_cuotas_nuevas == 0) {
+                    n_cuotas_nuevas = 1;
+                }
+                resumen.setFecha_ultimo_pago(fecha_pago);
+                resumen.setMonto_total_pagado(resumen.getMonto_total_pagado() + monto_por_pagar);
+                resumen.setN_cuotas_pagadas(n_cuotas_pagadas);
+                resumen.setSaldo_por_pagar(((resumen.getMonto_total_a_pagar() - resumen.getMonto_total_pagado()) / n_cuotas_nuevas));
             }
-
-            resumen.setFecha_ultimo_pago(fecha_pago);
-            resumen.setMonto_total_pagado(resumen.getMonto_total_pagado() + monto_por_pagar);
-            int nuevo_monto_1 = (int)((resumen.getMonto_total_a_pagar() - resumen.getMonto_total_pagado()) * interes);
-            int nuevo_monto_2 = resumen.getMonto_total_pagado() + nuevo_monto_1;
-            resumen.setN_cuotas_pagadas(n_cuotas_pagadas);
-            resumen.setSaldo_por_pagar((int)(((resumen.getMonto_total_a_pagar() - resumen.getMonto_total_pagado())/ n_cuotas_nuevas) * interes));
-            resumen.setMonto_total_a_pagar(nuevo_monto_2);
-            if(resumen.getN_cuotas_pagadas() > resumen.getN_cuotas_pactadas()){
-                resumen.setN_cuotas_pagadas(resumen.getN_cuotas_pactadas());
-            }
-            resumenRepository.save(resumen);
-        }
-        else {
-            if (n_cuotas_nuevas == 0) {
-                n_cuotas_nuevas = 1;
-            }
-            resumen.setFecha_ultimo_pago(fecha_pago);
-            resumen.setMonto_total_pagado(resumen.getMonto_total_pagado() + monto_por_pagar);
-            resumen.setN_cuotas_pagadas(n_cuotas_pagadas);
-            resumen.setSaldo_por_pagar(((resumen.getMonto_total_a_pagar() - resumen.getMonto_total_pagado()) / n_cuotas_nuevas));
             if (resumen.getN_cuotas_pagadas() > resumen.getN_cuotas_pactadas()) {
                 resumen.setN_cuotas_pagadas(resumen.getN_cuotas_pactadas());
             }
@@ -134,34 +120,29 @@ public class ResumenService {
     }
 
     public String formatearRut(String rut) {
-        // Verificar si el RUT es nulo o vacío
         if (rut == null || rut.isEmpty()) {
             return "";
         }
 
-        // Separar la parte numérica y el dígito verificador
-        String rutNumerico = rut.substring(0, rut.length() - 1);
-        String digitoVerificador = rut.substring(rut.length() - 1);
+        String rut_numerico = rut.substring(0, rut.length() - 1);
+        String digito_verificador = rut.substring(rut.length() - 1);
 
-        // Dar formato al RUT con puntos y guión
-        StringBuilder rutFormateado = new StringBuilder();
+        StringBuilder rut_formateado = new StringBuilder();
         int contador = 0;
 
-        // Iterar sobre el RUT numérico en reversa para agregar los puntos
-        for (int i = rutNumerico.length() - 1; i >= 0; i--) {
+        for (int i = rut_numerico.length() - 1; i >= 0; i--) {
             if (contador == 3) {
-                rutFormateado.insert(0, ".");
+                rut_formateado.insert(0, ".");
                 contador = 0;
             }
-            rutFormateado.insert(0, rutNumerico.charAt(i));
+            rut_formateado.insert(0, rut_numerico.charAt(i));
             contador++;
         }
 
-        // Agregar el dígito verificador y el guión
-        rutFormateado.append("-");
-        rutFormateado.append(digitoVerificador);
+        rut_formateado.append("-");
+        rut_formateado.append(digito_verificador);
 
-        return rutFormateado.toString();
+        return rut_formateado.toString();
     }
 
 

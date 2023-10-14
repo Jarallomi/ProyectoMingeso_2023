@@ -35,7 +35,6 @@ public class ResumenEntity {
 
     public String getRutSinPuntosYGuion() {
         return rut.replace(".", "").replace("-", "");
-
     }
 
 

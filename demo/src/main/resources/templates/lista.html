@@ -3,20 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <title>Lista de Resúmenes</title>
-    <!-- Enlace al archivo CSS de Bootstrap desde un CDN (Añade Bootstrap a tu proyecto si aún no lo has hecho) -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
     <style>
-        /* Estilos personalizados */
         body {
             background-color: #f8f9fa;
             padding: 20px;
         }
         h1 {
-            text-align: center;
             margin-bottom: 20px;
         }
         table {
-            width: 120%; /* Aumenta el ancho de la tabla para que se extienda más hacia los lados */
+            width: 120%;
             border-collapse: collapse;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         }
@@ -36,7 +33,10 @@
 </head>
 <body>
 <div class="container">
-    <h1>Lista de Resúmenes</h1>
+    <div class="d-flex justify-content-between">
+        <h1>Lista de Resúmenes</h1>
+        <a href="index" class="btn btn-secondary align-self-center">Volver</a>
+    </div>
     <table class="table table-striped">
         <thead class="thead-dark">
         <tr>
@@ -75,12 +75,9 @@
             </td>
             <td th:text="${resumen.n_cuotas_retraso}"></td>
             <td>
-                <!-- Condición para mostrar el mensaje "El pago está al día" -->
                 <div th:if="${resumen.n_cuotas_pactadas == resumen.n_cuotas_pagadas}">
                     El pago está al día
                 </div>
-
-                <!-- Condición para mostrar el botón de registro de pago -->
                 <div th:unless="${resumen.n_cuotas_pactadas == resumen.n_cuotas_pagadas}">
                     <a th:href="@{'/registrarPagoCuotas?rut=' + ${resumen.rutSinPuntosYGuion}}"
                        class="btn btn-primary btn-sm">Registrar Pago de Cuotas</a>
@@ -92,12 +89,10 @@
 </div>
 
 <script>
-    // Función para dar formato de moneda a un número
     function formatMoney(number) {
         return new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(number);
     }
 
-    // Aplicar formato de moneda a elementos con la clase "money-format"
     document.addEventListener('DOMContentLoaded', function () {
         var moneyElements = document.querySelectorAll('.money-format');
         moneyElements.forEach(function (element) {

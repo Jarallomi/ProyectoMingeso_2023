@@ -59,6 +59,7 @@ public class SubirArchivoService {
         String texto = "";
         BufferedReader bf = null;
         try{
+            assert direccion != null;
             bf = new BufferedReader(new FileReader(direccion));
             String temp = "";
             String bfRead;
@@ -95,24 +96,22 @@ public class SubirArchivoService {
     }
 
     public void guardarArchivoDB(String RUT, String fecha, Integer puntaje){
-        SubirArchivoEntity estudianteAVG = obtenerPorRut(RUT);
-        if (estudianteAVG != null){
-            SubirArchivoEntity estudianteExistente = estudianteAVG;
-            estudianteExistente.setFecha(fecha);
-            estudianteExistente.setN_examenes(estudianteAVG.getN_examenes() + 1);
-            int promedio = (estudianteAVG.getPuntaje() + puntaje) / (estudianteExistente.getN_examenes());
-            estudianteExistente.setPuntaje(promedio);
-            guardarArchivo(estudianteExistente);
+        SubirArchivoEntity estudiante_promedio = obtenerPorRut(RUT);
+        if (estudiante_promedio != null){
+            estudiante_promedio.setFecha(fecha);
+            estudiante_promedio.setN_examenes(estudiante_promedio.getN_examenes() + 1);
+            int promedio = (estudiante_promedio.getPuntaje() + puntaje) / (estudiante_promedio.getN_examenes());
+            estudiante_promedio.setPuntaje(promedio);
+            guardarArchivo(estudiante_promedio);
         }
         else{
-            SubirArchivoEntity nuevoArchivo = new SubirArchivoEntity();
-            nuevoArchivo.setRut(RUT);
-            nuevoArchivo.setFecha(fecha);
-            nuevoArchivo.setPuntaje(puntaje);
-            nuevoArchivo.setN_examenes(1);
-            guardarArchivo(nuevoArchivo);
+            SubirArchivoEntity nuevo_archivo = new SubirArchivoEntity();
+            nuevo_archivo.setRut(RUT);
+            nuevo_archivo.setFecha(fecha);
+            nuevo_archivo.setPuntaje(puntaje);
+            nuevo_archivo.setN_examenes(1);
+            guardarArchivo(nuevo_archivo);
         }
-
     }
 
 

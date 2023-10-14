@@ -1,23 +1,19 @@
-<!-- formulario_pago_cuotas.html -->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Registrar Pago de Cuotas</title>
-    <!-- Enlace al archivo CSS de Bootstrap desde un CDN (Añade Bootstrap a tu proyecto si aún no lo has hecho) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
 </head>
 <body>
 <div class="container">
     <h1>Registrar Pago de Cuotas</h1>
     <form action="/registrarPagoCuotas" method="post">
-        <!-- Campo de RUT no modificable -->
         <div class="mb-3">
             <label for="rut" class="form-label">RUT del Estudiante:</label>
             <input type="text" class="form-control" id="rut" name="rut" th:value="${rut}" readonly>
         </div>
 
-        <!-- Campo de Fecha de Pago -->
         <div class="mb-3">
             <label for="fechaPago" class="form-label">Fecha de Pago:</label>
             <input type="date" class="form-control" id="fechaPago" name="fechaPago" required>
@@ -27,7 +23,6 @@
     </form>
 </div>
 
-<!-- Enlace a los scripts de Bootstrap desde un CDN -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.min.js" integrity="sha384-LbU2VpCpARV5Kb3aF5g5n9Epz7XCpVb3R0wE/lsf5B5z5PLFtFUGSc0TsCHfD2x5r" crossorigin="anonymous"></script>
 </body>
 </html>

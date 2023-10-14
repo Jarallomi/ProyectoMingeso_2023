@@ -4,23 +4,44 @@
     <meta charset="UTF-8">
     <title>Inicio</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <style>
+        body {
+            background-color: #f4f5f7;
+            font-family: 'Arial', sans-serif;
+        }
+        .centered {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        h1 {
+            margin-bottom: 30px;
+            color: #007bff;
+        }
+        .btn {
+            margin: 10px;
+            width: 200px;
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-    <h1>Página de Inicio</h1>
+<div class="container centered">
+    <h1>Preuniversitario TopEducation</h1>
 
-    <!-- Botón para subir archivo -->
     <div class="mb-3">
         <a href="/subirArchivo" class="btn btn-primary">Subir Archivo</a>
     </div>
 
-    <!-- Botón para registro de estudiante -->
     <div class="mb-3">
         <a href="/registroEstudiante" class="btn btn-primary">Registro de Estudiante</a>
     </div>
+
+    <div class="mb-3">
+        <a href="/lista" class="btn btn-primary">Lista Estudiantes</a>
+    </div>
 </div>
 
-<!-- Bootstrap JS (si es necesario) -->
-<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.min.js" integrity="sha384-..." crossorigin="anonymous"></script> -->
 </body>
 </html>
