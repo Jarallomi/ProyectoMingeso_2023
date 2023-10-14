@@ -65,45 +65,44 @@ public class ResumenService {
     }
 
     public void modificarCuota(Date fecha_pago, String rut){
-        if(resumenRepository.findById(rut).isPresent()) {
             ResumenEntity resumen = resumenRepository.findById(rut).get();
+            if(resumenRepository.findById(rut).isPresent()) {
+                Calendar fecha_nueva = Calendar.getInstance();
 
-            Calendar fecha_nueva = Calendar.getInstance();
+                int monto_por_pagar = resumen.getSaldo_por_pagar();
+                int n_cuotas_pagadas = resumen.getN_cuotas_pagadas() + 1;
+                int n_cuotas_nuevas = resumen.getN_cuotas_pactadas() - n_cuotas_pagadas;
 
-            int monto_por_pagar = resumen.getSaldo_por_pagar();
-            int n_cuotas_pagadas = resumen.getN_cuotas_pagadas() + 1;
-            int n_cuotas_nuevas = resumen.getN_cuotas_pactadas() - n_cuotas_pagadas;
+                int meses_atraso = calcularMesesAtraso(fecha_pago, fecha_nueva.getTime());
 
-            int meses_atraso = calcularMesesAtraso(fecha_pago, fecha_nueva.getTime());
+                if (meses_atraso >= 1) {
+                    double interes = (0.03 * meses_atraso) + 1;
 
-            if (meses_atraso >= 1) {
-                double interes = (0.03 * meses_atraso) + 1;
+                    if (n_cuotas_nuevas == 0) {
+                        n_cuotas_nuevas = 1;
+                    }
 
-                if (n_cuotas_nuevas == 0) {
-                    n_cuotas_nuevas = 1;
+                    resumen.setFecha_ultimo_pago(fecha_pago);
+                    resumen.setMonto_total_pagado(resumen.getMonto_total_pagado() + monto_por_pagar);
+                    int nuevo_monto_1 = (int) ((resumen.getMonto_total_a_pagar() - resumen.getMonto_total_pagado()) * interes);
+                    int nuevo_monto_2 = resumen.getMonto_total_pagado() + nuevo_monto_1;
+                    resumen.setN_cuotas_pagadas(n_cuotas_pagadas);
+                    resumen.setSaldo_por_pagar((int) (((resumen.getMonto_total_a_pagar() - resumen.getMonto_total_pagado()) / n_cuotas_nuevas) * interes));
+                    resumen.setMonto_total_a_pagar(nuevo_monto_2);
+                } else {
+                    if (n_cuotas_nuevas == 0) {
+                        n_cuotas_nuevas = 1;
+                    }
+                    resumen.setFecha_ultimo_pago(fecha_pago);
+                    resumen.setMonto_total_pagado(resumen.getMonto_total_pagado() + monto_por_pagar);
+                    resumen.setN_cuotas_pagadas(n_cuotas_pagadas);
+                    resumen.setSaldo_por_pagar(((resumen.getMonto_total_a_pagar() - resumen.getMonto_total_pagado()) / n_cuotas_nuevas));
                 }
-
-                resumen.setFecha_ultimo_pago(fecha_pago);
-                resumen.setMonto_total_pagado(resumen.getMonto_total_pagado() + monto_por_pagar);
-                int nuevo_monto_1 = (int) ((resumen.getMonto_total_a_pagar() - resumen.getMonto_total_pagado()) * interes);
-                int nuevo_monto_2 = resumen.getMonto_total_pagado() + nuevo_monto_1;
-                resumen.setN_cuotas_pagadas(n_cuotas_pagadas);
-                resumen.setSaldo_por_pagar((int) (((resumen.getMonto_total_a_pagar() - resumen.getMonto_total_pagado()) / n_cuotas_nuevas) * interes));
-                resumen.setMonto_total_a_pagar(nuevo_monto_2);
-            } else {
-                if (n_cuotas_nuevas == 0) {
-                    n_cuotas_nuevas = 1;
+                if (resumen.getN_cuotas_pagadas() > resumen.getN_cuotas_pactadas()) {
+                    resumen.setN_cuotas_pagadas(resumen.getN_cuotas_pactadas());
                 }
-                resumen.setFecha_ultimo_pago(fecha_pago);
-                resumen.setMonto_total_pagado(resumen.getMonto_total_pagado() + monto_por_pagar);
-                resumen.setN_cuotas_pagadas(n_cuotas_pagadas);
-                resumen.setSaldo_por_pagar(((resumen.getMonto_total_a_pagar() - resumen.getMonto_total_pagado()) / n_cuotas_nuevas));
+                resumenRepository.save(resumen);
             }
-            if (resumen.getN_cuotas_pagadas() > resumen.getN_cuotas_pactadas()) {
-                resumen.setN_cuotas_pagadas(resumen.getN_cuotas_pactadas());
-            }
-            resumenRepository.save(resumen);
-        }
     }
 
     private int calcularMesesAtraso(Date fechaPago, Date fechaActual) {
