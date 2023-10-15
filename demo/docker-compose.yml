@@ -1,5 +1,17 @@
 version: "3.9"
 services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx-proxy
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - app1
+      - app2
+      - app3
   postgres-db:
     image: postgres
     restart: always
@@ -10,11 +22,39 @@ services:
       POSTGRES_DB: ProyectoMingeso
     ports:
       - 5432:5432
-  app:
-    container_name: proyecto_tingeso
+  app1:
+    container_name: proyecto_tingeso1
     image: jaramillo1337/proyecto_tingeso
     ports:
-      - "8086:8086"
+      - "8087:8086"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/ProyectoMingeso?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=2905
+    deploy:
+      restart_policy:
+        condition: on-failure
+    depends_on:
+      - postgres-db
+  app2:
+    container_name: proyecto_tingeso2
+    image: jaramillo1337/proyecto_tingeso
+    ports:
+      - "8088:8086"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/ProyectoMingeso?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=2905
+    deploy:
+      restart_policy:
+        condition: on-failure
+    depends_on:
+      - postgres-db
+  app3:
+    container_name: proyecto_tingeso3
+    image: jaramillo1337/proyecto_tingeso
+    ports:
+      - "8089:8086"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/ProyectoMingeso?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false
       - SPRING_DATASOURCE_USERNAME=postgres
