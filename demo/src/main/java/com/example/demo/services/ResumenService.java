@@ -87,7 +87,7 @@ public class ResumenService {
                     int nuevo_monto_1 = (int) ((resumen.getMonto_total_a_pagar() - resumen.getMonto_total_pagado()) * interes);
                     int nuevo_monto_2 = resumen.getMonto_total_pagado() + nuevo_monto_1;
                     resumen.setN_cuotas_pagadas(n_cuotas_pagadas);
-                    resumen.setSaldo_por_pagar((int) (((resumen.getMonto_total_a_pagar() - resumen.getMonto_total_pagado()) / n_cuotas_nuevas) * interes));
+                    resumen.setSaldo_por_pagar((int) Math.round(((double) (resumen.getMonto_total_a_pagar() - resumen.getMonto_total_pagado()) / n_cuotas_nuevas) * interes));
                     resumen.setMonto_total_a_pagar(nuevo_monto_2);
                 } else {
                     if (n_cuotas_nuevas == 0) {
