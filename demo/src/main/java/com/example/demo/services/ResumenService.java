@@ -65,8 +65,9 @@ public class ResumenService {
     }
 
     public void modificarCuota(Date fecha_pago, String rut){
-            ResumenEntity resumen = resumenRepository.findById(rut).get();
-            if(resumenRepository.findById(rut).isPresent()) {
+            Optional<ResumenEntity> resumen_Optional = resumenRepository.findById(rut);
+            if(resumen_Optional.isPresent()) {
+                ResumenEntity resumen = resumen_Optional.get();
                 Calendar fecha_nueva = Calendar.getInstance();
 
                 int monto_por_pagar = resumen.getSaldo_por_pagar();
