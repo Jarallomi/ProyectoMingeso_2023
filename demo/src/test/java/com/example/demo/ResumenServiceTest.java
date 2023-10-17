@@ -3,11 +3,11 @@ package com.example.demo;
 import com.example.demo.entities.EstudianteEntity;
 import com.example.demo.entities.ResumenEntity;
 import com.example.demo.entities.SubirArchivoEntity;
-import com.example.demo.repositories.EstudianteRepository;
 import com.example.demo.repositories.ResumenRepository;
-import com.example.demo.repositories.SubirArchivoRepository;
 import com.example.demo.services.CalculosCuotas;
+import com.example.demo.services.EstudianteService;
 import com.example.demo.services.ResumenService;
+import com.example.demo.services.SubirArchivoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -28,9 +28,9 @@ public class ResumenServiceTest {
     @Mock
     private ResumenRepository resumenRepository;
     @Mock
-    private EstudianteRepository estudianteRepository;
+    private EstudianteService estudianteService;
     @Mock
-    private SubirArchivoRepository archivoRepository;
+    private SubirArchivoService archivoService;
     @Mock
     private CalculosCuotas calculosCuotas;
     private ResumenEntity resumenEjemplo;
@@ -59,15 +59,16 @@ public class ResumenServiceTest {
         EstudianteEntity estudiante = new EstudianteEntity("20.485.432-9", "Perez", "Juan", "2000-05-02", "Municipal", "Nido de Agilas", 2018, "Cuotas", 5);
         SubirArchivoEntity archivo = new SubirArchivoEntity("20.485.432-9", "2021-10-14", 600, 3);
 
-        when(estudianteRepository.findAll()).thenReturn(Arrays.asList(estudiante));
+        when(estudianteService.encontrarTodos()).thenReturn(Arrays.asList(estudiante));
         when(resumenRepository.findById(anyString())).thenReturn(Optional.empty());
-        when(archivoRepository.findById(anyString())).thenReturn(Optional.of(archivo));
+        when(archivoService.obtenerPorRutOptional(anyString())).thenReturn(Optional.of(archivo));
         when(calculosCuotas.calcularCuotaFinal(any(), any(), anyDouble())).thenReturn(1000000.0);
 
         resumenService.guardarResumen();
 
         verify(resumenRepository).save(any(ResumenEntity.class));
     }
+
 
     @Test
     public void obtenerTodosLosResumenes() {

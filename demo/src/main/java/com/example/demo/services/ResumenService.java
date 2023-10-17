@@ -22,19 +22,19 @@ public class ResumenService {
     @Autowired
     private ResumenRepository resumenRepository;
     @Autowired
-    private EstudianteRepository estudianteRepository;
+    private EstudianteService estudianteService;
     @Autowired
-    private SubirArchivoRepository archivoRepository;
+    private SubirArchivoService subirArchivoService;
 
     public void guardarResumen(){
-        List<EstudianteEntity> estudiantes = (List<EstudianteEntity>) estudianteRepository.findAll();
+        List<EstudianteEntity> estudiantes = estudianteService.encontrarTodos();
 
         for (EstudianteEntity estudiante : estudiantes){
             String rut = estudiante.getRut();
             Optional<ResumenEntity> resumenOpcional = resumenRepository.findById(rut);
 
             if(resumenOpcional.isEmpty()) {
-                Optional<SubirArchivoEntity> archivoOpcional = archivoRepository.findById(rut);
+                Optional<SubirArchivoEntity> archivoOpcional = subirArchivoService.obtenerPorRutOptional(rut);
                 if (archivoOpcional.isPresent()) {
                     SubirArchivoEntity archivo = archivoOpcional.get();
 

@@ -9,6 +9,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
+
 
 @SpringBootTest
 public class EstudianteServiceTest {
@@ -31,11 +37,20 @@ public class EstudianteServiceTest {
         String tipo_pago = "Cuotas";
         Integer n_cuotas = 10;
 
-        Mockito.when(estudianteRepository.save(Mockito.any(EstudianteEntity.class))).thenReturn(new EstudianteEntity());
+        when(estudianteRepository.save(Mockito.any(EstudianteEntity.class))).thenReturn(new EstudianteEntity());
         estudianteService.guardarEstudiante(rut, apellidos, nombres, fecha_nacimiento, tipo_colegio, nombre_colegio, anio_egreso, tipo_pago, n_cuotas);
         Mockito.verify(estudianteRepository, Mockito.times(1)).save(Mockito.any(EstudianteEntity.class));
     }
 
+    @Test
+    public void encontrarTodos(){
+        EstudianteEntity estudiante = new EstudianteEntity("20.485.432-9", "Perez", "Juan", "2000-05-02", "Municipal", "Liceo Nacional", 2020, "Cuotas", 10);
+
+        when(estudianteRepository.findAll()).thenReturn(Collections.singletonList(estudiante));
+        List<EstudianteEntity> result = estudianteService.encontrarTodos();
+
+        assertEquals(Collections.singletonList(estudiante), result);
+    }
 
 
 }

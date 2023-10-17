@@ -91,6 +91,10 @@ public class SubirArchivoService {
         Optional<SubirArchivoEntity> archivo = archivoRepository.findById(rut);
         return archivo.orElse(null);
     }
+
+    public Optional<SubirArchivoEntity> obtenerPorRutOptional(String rut){
+        return archivoRepository.findById(rut);
+    }
     public void guardarArchivo(SubirArchivoEntity archivo) {
         archivoRepository.save(archivo);
     }

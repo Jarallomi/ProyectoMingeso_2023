@@ -5,6 +5,8 @@ import com.example.demo.repositories.EstudianteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class EstudianteService {
 
@@ -13,6 +15,10 @@ public class EstudianteService {
     @Autowired
     public EstudianteService(EstudianteRepository estudianteRepository) {
         this.estudianteRepository = estudianteRepository;
+    }
+
+    public List<EstudianteEntity> encontrarTodos(){
+        return (List<EstudianteEntity>) estudianteRepository.findAll();
     }
 
     public void guardarEstudiante(String rut, String apellidos, String nombres, String fecha_nacimiento, String tipo_colegio, String nombre_colegio, Integer anio_egreso, String tipo_pago, Integer n_cuotas) {
